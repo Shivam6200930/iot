@@ -1,32 +1,33 @@
+const WebSocket = require('ws');
 const express = require('express');
 const http = require('http');
-const { Server } = require('socket.io');  // Use { Server } to avoid confusion
 const cors = require('cors');
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: '*',
-    methods: ['GET', 'POST']
-  }
-});
+const wss = new WebSocket.Server({ server });
 
 app.use(cors());
 app.use(express.json());
 
-io.on('connection', (socket) => {
-  console.log('Client connected:', socket.id);
+wss.on('connection', (ws) => {
+    console.log('Client connected');
 
-  socket.on('fan-action', (data) => {
-    console.log('Received Fan Action:', data);
-    io.emit('fan-status', data); // Broadcast the fan status
-  });
+    ws.on('message', (message) => {
+        console.log('Received:', message.toString());
 
-  socket.on('disconnect', () => {
-    console.log('Client disconnected:', socket.id);
-  });
+        // Handle ON/OFF actions
+        if (message.toString() === "ON") {
+            ws.send("Fan ON");
+        } else if (message.toString() === "OFF") {
+            ws.send("Fan OFF");
+        }
+    });
+
+    ws.on('close', () => {
+        console.log('Client disconnected');
+    });
 });
 
-const PORT = process.env.PORT || 5000;  // Use dynamic port for deployment
+const PORT = 5000;
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
