@@ -22,6 +22,11 @@ wss.on('connection', (ws) => {
         } else if (message.toString() === "OFF") {
             ws.send("Fan OFF");
         }
+        wss.clients.forEach((client) => {
+          if (client.readyState === WebSocket.OPEN) {
+              client.send(data);  
+          }
+      });
     });
 
     ws.on('close', () => {
