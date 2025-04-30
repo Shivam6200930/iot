@@ -2,6 +2,7 @@ const User = require('../models/User');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { OAuth2Client } = require('google-auth-library');
+const  askChatGPT  = require('../config/chatGpt');
 const twilio = require('twilio');
 const dotenv = require('dotenv');
 dotenv.config();
@@ -322,3 +323,18 @@ exports.updateState = async(req,res)=>{
   }
 }
 
+ exports.chatbotHandler = async (req, res) => {
+  try {
+    const { message } = req.body;
+
+    if (!message) {
+      return res.status(400).json({ error: 'Message is required' });
+    }
+
+    const reply = await askChatGPT(message);
+    res.status(200).json({ reply });
+  } catch (error) {
+    console.error('Chatbot error:', error.message);
+    res.status(500).json({ error: 'Failed to get response from chatbot' });
+  }
+};

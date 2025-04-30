@@ -9,6 +9,7 @@ const {
   googleLogin,
   sendOtp,
   verifyOtp,
+  chatbotHandler
   
 } = require('../controllers/userController');
 
@@ -21,7 +22,7 @@ router.get('/getUser/:userId',getUser)
 router.post('/google-login', googleLogin);
 router.post('/send-otp',sendOtp)
 router.post('/verify-otp',verifyOtp)
-
+router.post('/chatbot',chatbotHandler)
 
 
 
